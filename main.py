@@ -36,8 +36,10 @@ def harm_codes(fp):        #returns the contents of a text file as a list of str
 # for i in range(2, inv_row_count):
 #     if inv_ws.cell(row=i, column=6).value in harm_codes("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"):
 #         print("steel decleration required", inv_ws.cell(row=i, column=6).value)
-
 for i in range(2, inv_row_count):
-    for c in harm_codes("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"):
-        if c in inv_ws.cell(row=i, column=6).value:
+    for hc in harm_codes("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"):
+        hc_len = len(hc)
+        value = inv_ws.cell(row=i, column=6).value
+        if value[:hc_len] == hc:
             print("steel decleration required", inv_ws.cell(row=i, column=6).value)
+            break
