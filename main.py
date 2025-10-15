@@ -18,10 +18,15 @@ while has_data:
     if data == None:
         has_data = False
 
-for i in range(2, inv_row_count):    # finds the codes in workbook that require steel declaration.
-    for hc in harm_codes("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"):
-        hc_len = len(hc)
-        value = inv_ws.cell(row=i, column=6).value
-        if value[:hc_len] == hc:
-            print("steel decleration required", inv_ws.cell(row=i, column=6).value)
-            break
+def find_declaration_req(codes):       # finds the codes in workbook that require steel declaration.
+    declaration_req = []
+    for i in range(1, inv_row_count):    
+        for hc in codes:
+            hc_len = len(hc)
+            value = inv_ws.cell(row=i, column=6).value
+            if value[:hc_len] == hc:
+                declaration_req.append(inv_ws.cell(row=i, column=6))
+                break
+    return declaration_req
+
+print(find_declaration_req(harm_codes("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt")))
