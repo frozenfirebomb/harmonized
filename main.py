@@ -1,13 +1,13 @@
 import openpyxl
 from openpyxl import workbook
 
-from functions import harm_codes
+from functions import *
 
 inv_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVDAY_master.xlsx")
 inv_ws = inv_wb[ 'Sheet1']
 
 metal_master_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/metal_content_master.xlsx")
-# metal_master_ws = metal_master_wb['Sheet1']
+metal_master_ws = metal_master_wb['Sheet1']
 
 steel_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"
 alum_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/aluminumHTSlist_justnumbers.txt"
@@ -32,8 +32,17 @@ def find_declaration_req(codes):       # finds the codes in workbook that requir
         for hc in codes:
             value = inv_ws.cell(row=i, column=6).value
             if value[:len(hc)] == hc:
-                declaration_req.append(inv_ws.cell(row=i, column=6).coordinate)
+                declaration_req.append(inv_ws.cell(row=i, column=6))
                 break
     return declaration_req
 
-print(find_declaration_req(harm_codes(steel_codes)))
+def declared_sku(harm_cell):        # finds sku associated with harm requiring declaration.
+    skus = []
+    for cell in harm_cell:
+        skus.append(inv_ws.cell(row=cell.row, column=3).value)
+    return skus
+
+steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
+alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
+
+print(steel_sku, alum_sku)
