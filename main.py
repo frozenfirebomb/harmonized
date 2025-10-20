@@ -60,3 +60,10 @@ def declared_sku(harm_cell):        # finds sku associated with harm requiring d
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
 alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
 
+print(steel_sku)
+
+for sku in steel_sku:
+    for i in range(1, metal_master_row_count):
+        value = metal_master_ws.cell(row=i, column=3).value
+        if value == sku:
+            print(metal_master_ws.cell(row=i, column=3))
