@@ -1,8 +1,6 @@
 import openpyxl
 from openpyxl import workbook
 
-from functions import *
-
 inv_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVDAY_master.xlsx")
 inv_ws = inv_wb[ 'Sheet1']
 
@@ -26,6 +24,23 @@ while has_data:
     if data == None:
         has_data = False
 
+has_data = True
+metal_master_row_count = 0
+
+while has_data:
+    metal_master_row_count += 1
+    data = metal_master_ws.cell(row=metal_master_row_count, column=9).value
+    if data == None:
+        has_data = False
+
+def harm_codes(fp):        # returns the contents of a text file as a list of strings from a file path provided as a string
+    codes = []
+    with open(fp) as f:
+        file_contents = f.read()    
+    for content in file_contents.split():
+        codes.append(content)
+    return codes
+
 def find_declaration_req(codes):       # finds the codes in workbook that require steel declaration.
     declaration_req = []
     for i in range(1, inv_row_count):    
@@ -45,4 +60,3 @@ def declared_sku(harm_cell):        # finds sku associated with harm requiring d
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
 alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
 
-print(steel_sku, alum_sku)
