@@ -1,5 +1,5 @@
 import openpyxl
-from openpyxl import workbook
+from openpyxl import Workbook
 
 inv_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVDAY_master.xlsx")
 inv_ws = inv_wb[ 'Sheet1']
@@ -7,13 +7,11 @@ inv_ws = inv_wb[ 'Sheet1']
 metal_master_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/metal_content_master.xlsx")
 metal_master_ws = metal_master_wb['Sheet1']
 
+final_wb = Workbook()
+final_ws = final_wb.active
+
 steel_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"
 alum_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/aluminumHTSlist_justnumbers.txt"
-
-# rows = ws.iter_rows(min_row=1, max_row=10, min_col=1, max_col=2)
-
-# for a,b in rows:
-#     print(a.value, b.value)
 
 has_data = True
 inv_row_count = 0
@@ -33,7 +31,7 @@ while has_data:
     if data == None:
         has_data = False
 
-def harm_codes(fp):        # returns the contents of a text file as a list of strings from a file path provided as a string
+def harm_codes(fp):        # returns the contents of a text file as a list of strings from a file path
     codes = []
     with open(fp) as f:
         file_contents = f.read()    
@@ -54,7 +52,7 @@ def find_declaration_req(codes):       # finds the codes in workbook that requir
 def declared_sku(harm_cell):        # finds sku associated with harm requiring declaration.
     skus = []
     for cell in harm_cell:
-        skus.append(inv_ws.cell(row=cell.row, column=3).value)
+        skus.append(inv_ws.cell(row=cell.row, column=3))
     return skus
 
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
@@ -65,5 +63,9 @@ print(steel_sku)
 for sku in steel_sku:
     for i in range(1, metal_master_row_count):
         value = metal_master_ws.cell(row=i, column=3).value
-        if value == sku:
-            print(metal_master_ws.cell(row=i, column=3))
+        if value == sku.value:
+            for cell1 in final_ws[f"A{i-1}" : f"H{i+2}"] metal_master_ws[f"A{i-1}" : f"H{i+2}"]:
+        
+            # print(metal_master_ws[f"A{i-1}" : f"H{i+2}"])
+
+final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/final_test.xlsx")
