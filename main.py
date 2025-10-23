@@ -14,7 +14,7 @@ final_ws = final_wb.active
 steel_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"
 alum_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/aluminumHTSlist_justnumbers.txt"
 
-has_data = True     # lines 16 - 23, used to find the number of rows in the inv sheet that contain data.
+has_data = True     # while loop used to find the number of rows in the inv sheet that contain data.
 inv_row_count = 0
 
 while has_data:
@@ -23,7 +23,7 @@ while has_data:
     if data == None:
         has_data = False
 
-has_data = True     # lines 25-32, used to find the number of rows in the metal_master sheet that contain data.
+has_data = True     # while loop used to find the number of rows in the metal_master sheet that contain data.
 metal_master_row_count = 0
 
 while has_data:
@@ -59,18 +59,20 @@ def declared_sku(harm_cell):        # finds sku associated with harm requiring d
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
 alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
 
-print(metal_master_ws['A6'].border)
-
-# final_ws['A1'] = metal_master_ws['A1'].value
+final_ws_tracker = 0
 
 for sku in steel_sku:
     for i in range(1, metal_master_row_count):
         value = metal_master_ws.cell(row=i, column=3).value
         if value == sku.value:
-            metal_master_section = metal_master_ws[f"A{i-1}" : f"H{i+2}"]
-            final_section = final_ws[f"A{i-1}" : f"H{i+2}"]
-            metal_master_cells = [val for row in metal_master_section for val in row]
-            for i in metal_master_cells:
-                print(i)
+            metal_master_range = metal_master_ws[f"A{i-1}" : f"H{i+2}"]
+            final_range = final_ws[f"A{i-1+final_ws_tracker}" : f"H{i+2+final_ws_tracker}"]
+            final_ws_tracker += 5
+            metal_master_cells = [val for row in metal_master_range for val in row]
+            final_cells = [val for row in final_range for val in row]
+            print(final_cells)
+            for i in range(32):     # 32 is the 4x8 length/area of the ranges.
+                final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
+
 
 final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/final_test.xlsx")
