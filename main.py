@@ -64,15 +64,15 @@ final_ws_tracker = 0
 for sku in steel_sku:
     for i in range(1, metal_master_row_count):
         value = metal_master_ws.cell(row=i, column=3).value
-        if value == sku.value:
+        if sku.value == value:
             metal_master_range = metal_master_ws[f"A{i-1}" : f"H{i+2}"]
-            final_range = final_ws[f"A{i-1+final_ws_tracker}" : f"H{i+2+final_ws_tracker}"]
-            final_ws_tracker += 5
+            final_range = final_ws[f"A{1+final_ws_tracker}" : f"H{4+final_ws_tracker}"]
             metal_master_cells = [val for row in metal_master_range for val in row]
             final_cells = [val for row in final_range for val in row]
-            print(final_cells)
             for i in range(32):     # 32 is the 4x8 length/area of the ranges.
                 final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
+            final_ws_tracker += 5
+
 
 
 final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/final_test.xlsx")
