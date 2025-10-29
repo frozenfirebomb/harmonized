@@ -61,33 +61,40 @@ alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
 
 final_ws_tracker = 0
 
-def final_ws_editing(skus):         # adds shipment info ETC, to the final sheet for each sku that needs to be declared.
+def final_ws_editing(skus):         # adds shipment info to the final sheet for each sku that needs to be declared.
     global final_ws_tracker
     sku_row_in_metal_master = [] 
+
     for i in list(metal_master_ws.iter_rows(min_row=1, max_row=metal_master_row_count, min_col=3, max_col=3)):
         for x in i:
             sku_row_in_metal_master.append(x.value)
+
     for sku in skus:
         if sku.value not in sku_row_in_metal_master:
-            print(f"{sku.value} needs to be declared.")
+            print(f"Sku {sku.value} needs to be declared.")
             continue
+
         for i in range(1, metal_master_row_count):
             value = metal_master_ws.cell(row=i, column=3).value
+            
             if sku.value == value:
                 metal_master_range = metal_master_ws[f"A{i-1}" : f"H{i+2}"]
                 metal_master_cells = [val for row in metal_master_range for val in row]
+                
                 final_range = final_ws[f"A{1+final_ws_tracker}" : f"H{4+final_ws_tracker}"]
                 final_cells = [val for row in final_range for val in row]
-                for i in range(32):     # 32 is the 4x8 length/area of the ranges.
+                
+                for i in range(len(final_cells)):    
                     final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
                 final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value
                 final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value
                 final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"D{sku.row}"].value
                 final_ws[f"E{2 + final_ws_tracker}"] = round(inv_ws[f"E{sku.row}"].value * final_ws[f"E{2 + final_ws_tracker}"].value, 2)
                 final_ws[f"H{2 + final_ws_tracker}"] = final_ws[f"D{2 + final_ws_tracker}"].value * final_ws[f"E{2 + final_ws_tracker}"].value
+                
                 final_ws_tracker += 5
 
 final_ws_editing(steel_sku)
-# final_ws_editing(alum_sku)
+final_ws_editing(alum_sku)
 
 final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/final_test.xlsx")
