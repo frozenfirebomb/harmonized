@@ -1,6 +1,6 @@
 import openpyxl
 from openpyxl import Workbook
-from openpyxl.styles import Border
+from openpyxl.styles import Font
 
 inv_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVDAY_master.xlsx")
 inv_ws = inv_wb[ 'Sheet1']
@@ -94,6 +94,23 @@ def final_ws_editing(skus):         # adds shipment info to the final sheet for 
                 final_ws[f"H{2 + final_ws_tracker}"] = (final_ws[f"D{2 + final_ws_tracker}"].value  # calculates total value of metal
                                                         * final_ws[f"E{2 + final_ws_tracker}"].value)
                 
+                font_bold = Font(bold= True)
+
+                first_row_range = final_ws[f"A{1 + final_ws_tracker}" : f"H{1 + final_ws_tracker}"]
+                first_row = [val for row in first_row_range for val in row]
+                
+                third_row_range = final_ws[f"A{3 + final_ws_tracker}" : f"H{3 + final_ws_tracker}"]
+                third_row = [val for row in third_row_range for val in row]
+
+                fourth_row_range = final_ws[f"A{4 + final_ws_tracker}" : f"H{4 + final_ws_tracker}"]
+                fourth_row = [val for row in fourth_row_range for val in row]
+
+                for cell in first_row:
+                    final_ws[cell.coordinate].font = font_bold
+                
+                for cell in third_row:
+                    final_ws[cell.coordinate].font = font_bold
+
                 final_ws_tracker += 5
 
 final_ws_editing(steel_sku)
