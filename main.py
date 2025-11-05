@@ -1,6 +1,7 @@
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import Font
+from openpyxl.styles import Border, Side
 
 inv_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVDAY_master.xlsx")
 inv_ws = inv_wb[ 'Sheet1']
@@ -95,6 +96,9 @@ def final_ws_editing(skus):         # adds shipment info to the final sheet for 
                                                         * final_ws[f"E{2 + final_ws_tracker}"].value)
                 
                 font_bold = Font(bold= True)
+                border = Side(border_style= "thin")
+                border_top = Border(top= border)
+                border_bottom = Border(bottom= border)
 
                 first_row_range = final_ws[f"A{1 + final_ws_tracker}" : f"H{1 + final_ws_tracker}"]
                 first_row = [val for row in first_row_range for val in row]
@@ -107,9 +111,13 @@ def final_ws_editing(skus):         # adds shipment info to the final sheet for 
 
                 for cell in first_row:
                     final_ws[cell.coordinate].font = font_bold
-                
+                    final_ws[cell.coordinate].border = border_top
+
                 for cell in third_row:
                     final_ws[cell.coordinate].font = font_bold
+
+                for cell in fourth_row:
+                    final_ws[cell.coordinate].border = border_bottom
 
                 final_ws_tracker += 5
 
