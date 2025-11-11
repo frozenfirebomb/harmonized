@@ -1,9 +1,15 @@
+import os
+import glob
+
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.styles import Border, Side
 
-inv_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVDAY_master.xlsx")
+list_of_files = glob.glob("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVD*")
+latest_file = max(list_of_files, key=os.path.getctime)
+
+inv_wb = openpyxl.load_workbook(latest_file)
 inv_ws = inv_wb[ 'Sheet1']
 
 metal_master_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/metal_content_master.xlsx")
