@@ -85,26 +85,29 @@ def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for 
             value = metal_master_ws.cell(row=i, column=3).value
             
             if sku.value == value:
-                metal_master_range = metal_master_ws[f"A{i-1}" : f"H{i+2}"]  # Cell range of information relevant to the sku.
-                metal_master_cells = [val for row in metal_master_range for val in row]  # nested tuple unpacking.
-                
-                final_range = final_ws[f"A{1+final_ws_tracker}" : f"H{4+final_ws_tracker}"]  # Cell range to have information added.
-                final_cells = [val for row in final_range for val in row]
-                
-                for i in range(len(final_cells)):
-                    final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
-                final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
-                final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
-                final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"D{sku.row}"].value  # Changes the quanity of items sent.
-                final_ws[f"E{2 + final_ws_tracker}"] = round(inv_ws[f"E{sku.row}"].value    # Calculates the value of metal declared.
-                                                             * final_ws[f"E{2 + final_ws_tracker}"].value, 2)
-                final_ws[f"H{2 + final_ws_tracker}"] = (final_ws[f"D{2 + final_ws_tracker}"].value  # Calculates total value of metal.
-                                                        * final_ws[f"E{2 + final_ws_tracker}"].value)
-                
-                final_ws_formatting()
+                if metal in metal_master_ws.cell(row=i+2, column=1).value.lower():
+                    metal_master_range = metal_master_ws[f"A{i-1}" : f"H{i+2}"]  # Cell range of information relevant to the sku.
+                    metal_master_cells = [val for row in metal_master_range for val in row]  # nested tuple unpacking.
+                    
+                    final_range = final_ws[f"A{1+final_ws_tracker}" : f"H{4+final_ws_tracker}"]  # Cell range to have information added.
+                    final_cells = [val for row in final_range for val in row]
+                    
+                    for i in range(len(final_cells)):
+                        final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
+                    final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
+                    final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
+                    final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"D{sku.row}"].value  # Changes the quanity of items sent.
+                    final_ws[f"E{2 + final_ws_tracker}"] = round(inv_ws[f"E{sku.row}"].value    # Calculates the value of metal declared.
+                                                                * final_ws[f"E{2 + final_ws_tracker}"].value, 2)
+                    final_ws[f"H{2 + final_ws_tracker}"] = (final_ws[f"D{2 + final_ws_tracker}"].value  # Calculates total value of metal.
+                                                            * final_ws[f"E{2 + final_ws_tracker}"].value)
+                    
+                    final_ws_formatting()
 
-                final_ws_tracker += 5  # Increment progress by 5 to leave a space between each declared sku.
-
+                    final_ws_tracker += 5  # Increment progress by 5 to leave a space between each declared sku.
+                else:
+                    print(f"Sku {sku.value} needs {metal} to be declared.")
+                    
 def final_ws_formatting():  # Applies bold and borders to sections of excel to keep data visually separate in the final sheet.
     font_bold = Font(bold= True)        
     border = Side(border_style= "thin")
