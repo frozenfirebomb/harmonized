@@ -6,13 +6,13 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.styles import Border, Side
 
-list_of_files = glob.glob("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/INVD*")
+list_of_files = glob.glob("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/INVND*")
 latest_file = max(list_of_files, key=os.path.getctime)
 
 inv_wb = openpyxl.load_workbook(latest_file)
-inv_ws = inv_wb[ 'Sheet1']
+inv_ws = inv_wb['INVNDAY']
 
-metal_master_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/metal_content_master.xlsx")
+metal_master_wb = openpyxl.load_workbook("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/metal_content_master.xlsx")
 metal_master_ws = metal_master_wb['Sheet1']
 
 final_wb = Workbook()
@@ -35,7 +35,7 @@ metal_master_row_count = 0
 
 while has_data:
     metal_master_row_count += 1
-    data = metal_master_ws.cell(row=metal_master_row_count, column=9).value
+    data = metal_master_ws.cell(row=metal_master_row_count, column=10).value
     if data == None:
         has_data = False
 
@@ -51,16 +51,16 @@ def find_declaration_req(codes):  # Finds the codes in workbook that require ste
     declaration_req = []
     for i in range(1, inv_row_count):    
         for hc in codes:
-            value = inv_ws.cell(row=i, column=6).value
+            value = inv_ws.cell(row=i, column=11).value
             if value[:len(hc)] == hc:
-                declaration_req.append(inv_ws.cell(row=i, column=6))
+                declaration_req.append(inv_ws.cell(row=i, column=11))
                 break
     return declaration_req
 
 def declared_sku(harm_cell):  # Finds sku associated with harm requiring declaration.
     skus = []
     for cell in harm_cell:
-        skus.append(inv_ws.cell(row=cell.row, column=3))
+        skus.append(inv_ws.cell(row=cell.row, column=4))
     return skus
 
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
@@ -86,10 +86,10 @@ def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for 
             
             if sku.value == value:
                 if metal in metal_master_ws.cell(row=i+2, column=1).value.lower():
-                    metal_master_range = metal_master_ws[f"A{i-1}" : f"H{i+2}"]  # Cell range of information relevant to the sku.
+                    metal_master_range = metal_master_ws[f"A{i-1}" : f"I{i+2}"]  # Cell range of information relevant to the sku.
                     metal_master_cells = [val for row in metal_master_range for val in row]  # nested tuple unpacking.
                     
-                    final_range = final_ws[f"A{1+final_ws_tracker}" : f"H{4+final_ws_tracker}"]  # Cell range to have information added.
+                    final_range = final_ws[f"A{1+final_ws_tracker}" : f"I{4+final_ws_tracker}"]  # Cell range to have information added.
                     final_cells = [val for row in final_range for val in row]
                     
                     for i in range(len(final_cells)):
@@ -97,30 +97,31 @@ def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for 
                     final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
                     final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
                     final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"D{sku.row}"].value  # Changes the quanity of items sent.
-                    final_ws[f"E{2 + final_ws_tracker}"] = round(inv_ws[f"E{sku.row}"].value    # Calculates the value of metal declared.
-                                                                * final_ws[f"E{2 + final_ws_tracker}"].value, 2)
-                    final_ws[f"H{2 + final_ws_tracker}"] = (final_ws[f"D{2 + final_ws_tracker}"].value  # Calculates total value of metal.
-                                                            * final_ws[f"E{2 + final_ws_tracker}"].value)
+                    print(type(final_ws[f"F{2 + final_ws_tracker}"].value))
+                    final_ws[f"F{2 + final_ws_tracker}"] = round(inv_ws[f"J{sku.row}"].value
+                                                                * final_ws[f"F{2 + final_ws_tracker}"].value, 2)
+                    final_ws[f"I{2 + final_ws_tracker}"] = (final_ws[f"D{2 + final_ws_tracker}"].value  # Calculates total value of metal.
+                                                            * final_ws[f"F{2 + final_ws_tracker}"].value)
                     
                     final_ws_formatting()
 
                     final_ws_tracker += 5  # Increment progress by 5 to leave a space between each declared sku.
                 else:
                     print(f"Sku {sku.value} needs {metal} to be declared.")
-                    
+
 def final_ws_formatting():  # Applies bold and borders to sections of excel to keep data visually separate in the final sheet.
     font_bold = Font(bold= True)        
     border = Side(border_style= "thin")
     border_top = Border(top= border)
     border_bottom = Border(bottom= border)
 
-    first_row_range = final_ws[f"A{1 + final_ws_tracker}" : f"H{1 + final_ws_tracker}"]
+    first_row_range = final_ws[f"A{1 + final_ws_tracker}" : f"I{1 + final_ws_tracker}"]
     first_row = [val for row in first_row_range for val in row]
     
-    third_row_range = final_ws[f"A{3 + final_ws_tracker}" : f"H{3 + final_ws_tracker}"]
+    third_row_range = final_ws[f"A{3 + final_ws_tracker}" : f"I{3 + final_ws_tracker}"]
     third_row = [val for row in third_row_range for val in row]
 
-    fourth_row_range = final_ws[f"A{4 + final_ws_tracker}" : f"H{4 + final_ws_tracker}"]
+    fourth_row_range = final_ws[f"A{4 + final_ws_tracker}" : f"I{4 + final_ws_tracker}"]
     fourth_row = [val for row in fourth_row_range for val in row]
 
     for cell in first_row:
@@ -136,4 +137,4 @@ def final_ws_formatting():  # Applies bold and borders to sections of excel to k
 final_ws_editing(steel_sku, "steel")
 final_ws_editing(alum_sku, "aluminum")
 
-final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/final_test.xlsx")
+final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test.xls")
