@@ -96,12 +96,11 @@ def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for 
                         final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
                     final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
                     final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
-                    final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"D{sku.row}"].value  # Changes the quanity of items sent.
-                    print(type(final_ws[f"F{2 + final_ws_tracker}"].value))
-                    final_ws[f"F{2 + final_ws_tracker}"] = round(inv_ws[f"J{sku.row}"].value
-                                                                * final_ws[f"F{2 + final_ws_tracker}"].value, 2)
-                    final_ws[f"I{2 + final_ws_tracker}"] = (final_ws[f"D{2 + final_ws_tracker}"].value  # Calculates total value of metal.
-                                                            * final_ws[f"F{2 + final_ws_tracker}"].value)
+                    final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"H{sku.row}"].value  # Changes the quanity of items sent.
+                    final_ws[f"F{2 + final_ws_tracker}"] = round(float(inv_ws[f"J{sku.row}"].value) # float() used to work around ' infront of numbers
+                                                                * float(final_ws[f"F{2 + final_ws_tracker}"].value), 2)
+                    final_ws[f"I{2 + final_ws_tracker}"] = (float(final_ws[f"D{2 + final_ws_tracker}"].value)  # Calculates total value of metal.
+                                                            * float(final_ws[f"F{2 + final_ws_tracker}"].value))
                     
                     final_ws_formatting()
 
