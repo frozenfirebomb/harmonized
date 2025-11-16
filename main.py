@@ -72,20 +72,20 @@ def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for 
     global final_ws_tracker
     sku_row_in_metal_master = [] 
 
-    for i in list(metal_master_ws.iter_rows(min_row=1, max_row=metal_master_row_count, min_col=3, max_col=3)):
-        for x in i:
-            sku_row_in_metal_master.append(x.value)
-
+    # for i in list(metal_master_ws.iter_rows(min_row=1, max_row=metal_master_row_count, min_col=3, max_col=3)):
+    #     for x in i:
+    #         sku_row_in_metal_master.append(x.value)
     for sku in skus:
-        if sku.value not in sku_row_in_metal_master:
-            print(f"Sku {sku.value} needs {metal} to be declared.")
-            continue
-
+        # if sku.value not in sku_row_in_metal_master:
+        #     print(f"Sku {sku.value} needs {metal} to be declared.")
+        #     continue
+        needs_declaration = True  # used to track if a specific metal for a sku is declared. Eg, a code needing both aluminum & steel.
         for i in range(1, metal_master_row_count):
             value = metal_master_ws.cell(row=i, column=3).value
-            
+
             if sku.value == value:
                 if metal in metal_master_ws.cell(row=i+2, column=1).value.lower():
+                    needs_declaration = False
                     metal_master_range = metal_master_ws[f"A{i-1}" : f"I{i+2}"]  # Cell range of information relevant to the sku.
                     metal_master_cells = [val for row in metal_master_range for val in row]  # nested tuple unpacking.
                     
@@ -105,8 +105,8 @@ def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for 
                     final_ws_formatting()
 
                     final_ws_tracker += 5  # Increment progress by 5 to leave a space between each declared sku.
-                else:
-                    print(f"Sku {sku.value} needs {metal} to be declared.")
+        if needs_declaration == True:
+            print(f"Sku {sku.value} needs {metal} to be declared.")
 
 def final_ws_formatting():  # Applies bold and borders to sections of excel to keep data visually separate in the final sheet.
     font_bold = Font(bold= True)        
@@ -136,4 +136,4 @@ def final_ws_formatting():  # Applies bold and borders to sections of excel to k
 final_ws_editing(steel_sku, "steel")
 final_ws_editing(alum_sku, "aluminum")
 
-final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test.xls")
+final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test.xlsx")
