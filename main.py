@@ -21,6 +21,7 @@ final_ws = final_wb.active
 
 steel_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/steelHTSlist_justnumbers.txt"
 alum_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/aluminumHTSlist_justnumbers.txt"
+copper_codes = "/mnt/c/Users/Bart/Desktop/Harmonized Chapters/copperHTSlist_justnumbers.txt"
 
 has_data = True  # While loop used to find the number of rows in the inv sheet that contain data.
 inv_row_count = 0
@@ -66,6 +67,7 @@ def declared_sku(harm_cell):  # Finds sku associated with harm requiring declara
 
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
 alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
+copper_sku = declared_sku(find_declaration_req(harm_codes(copper_codes)))
 
 declared_ranges = []  # Tracking all ranges declared with relevant sku/cell pairing for sorting.
 
@@ -149,6 +151,7 @@ def final_ws_formatting():  # Applies bold and borders to sections of excel to k
 
 range_declaration(steel_sku, "steel")
 range_declaration(alum_sku, "aluminum")
+range_declaration(copper_sku, "copper")
 final_ws_editing(range_sort(declared_ranges))
 
 today = date.today().isoformat().replace("-","")
