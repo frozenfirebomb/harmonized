@@ -66,47 +66,60 @@ def declared_sku(harm_cell):  # Finds sku associated with harm requiring declara
 steel_sku = declared_sku(find_declaration_req(harm_codes(steel_codes)))
 alum_sku = declared_sku(find_declaration_req(harm_codes(alum_codes)))
 
-final_ws_tracker = 0  # Used to keep progress in the final worksheet and not overwrite data.
+declared_ranges = []  # Tracking all ranges declared with relevant sku/cell pairing for sorting.
 
-def final_ws_editing(skus, metal):  # Adds shipment info to the final sheet for each sku that needs to be declared.
-    global final_ws_tracker
-    sku_row_in_metal_master = [] 
+def range_declaration(skus, metal):  # finds the cell ranges in metal_master_ws that need to be declared and adds them to a list.
 
-    # for i in list(metal_master_ws.iter_rows(min_row=1, max_row=metal_master_row_count, min_col=3, max_col=3)):
-    #     for x in i:
-    #         sku_row_in_metal_master.append(x.value)
     for sku in skus:
-        # if sku.value not in sku_row_in_metal_master:
-        #     print(f"Sku {sku.value} needs {metal} to be declared.")
-        #     continue
         needs_declaration = True  # used to track if a specific metal for a sku is declared. Eg, a code needing both aluminum & steel.
+
         for i in range(1, metal_master_row_count):
             value = metal_master_ws.cell(row=i, column=3).value
 
             if sku.value == value:
                 if metal in metal_master_ws.cell(row=i+2, column=1).value.lower():
                     needs_declaration = False
+                    declared_range_and_sku = []
+                    
                     metal_master_range = metal_master_ws[f"A{i-1}" : f"I{i+2}"]  # Cell range of information relevant to the sku.
                     metal_master_cells = [val for row in metal_master_range for val in row]  # nested tuple unpacking.
-                    
-                    final_range = final_ws[f"A{1+final_ws_tracker}" : f"I{4+final_ws_tracker}"]  # Cell range to have information added.
-                    final_cells = [val for row in final_range for val in row]
-                    
-                    for i in range(len(final_cells)):
-                        final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
-                    final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
-                    final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
-                    final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"H{sku.row}"].value  # Changes the quanity of items sent.
-                    final_ws[f"F{2 + final_ws_tracker}"] = round(float(inv_ws[f"J{sku.row}"].value) # float() used to work around ' infront of numbers
-                                                                * float(final_ws[f"F{2 + final_ws_tracker}"].value), 2)
-                    final_ws[f"I{2 + final_ws_tracker}"] = (float(final_ws[f"D{2 + final_ws_tracker}"].value)  # Calculates total value of metal.
-                                                            * float(final_ws[f"F{2 + final_ws_tracker}"].value))
-                    
-                    final_ws_formatting()
 
-                    final_ws_tracker += 5  # Increment progress by 5 to leave a space between each declared sku.
+                    declared_range_and_sku.append(metal_master_cells)
+                    declared_range_and_sku.append(sku)
+                    declared_ranges.append(declared_range_and_sku)
+                    
         if needs_declaration == True:
             print(f"Sku {sku.value} needs {metal} to be declared.")
+
+def range_sort(ranges):
+    ranges_sorted = sorted(ranges, key=lambda pairing: pairing[1].row)
+    return ranges_sorted
+
+final_ws_tracker = 0  # Used to keep progress in the final worksheet and not overwrite data.
+
+def final_ws_editing(sorted_ranges):  # Adds shipment info to the final sheet for each sku that needs to be declared.
+    global final_ws_tracker
+
+    for list_range in sorted_ranges:
+        metal_master_cells = list_range[0]
+        sku = list_range[1]
+
+        final_range = final_ws[f"A{1+final_ws_tracker}" : f"I{4+final_ws_tracker}"]  # Cell range to have information added.
+        final_cells = [val for row in final_range for val in row]
+        
+        for i in range(len(final_cells)):
+            final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
+        final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
+        final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
+        final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"H{sku.row}"].value  # Changes the quanity of items sent.
+        final_ws[f"F{2 + final_ws_tracker}"] = round(float(inv_ws[f"J{sku.row}"].value) # float() used to work around ' infront of numbers
+                                                    * float(final_ws[f"F{2 + final_ws_tracker}"].value), 2)
+        final_ws[f"I{2 + final_ws_tracker}"] = (float(final_ws[f"D{2 + final_ws_tracker}"].value)  # Calculates total value of metal.
+                                                * float(final_ws[f"F{2 + final_ws_tracker}"].value))
+        
+        final_ws_formatting()
+
+        final_ws_tracker += 5  # Increment progress by 5 to leave a space between each declared sku.
 
 def final_ws_formatting():  # Applies bold and borders to sections of excel to keep data visually separate in the final sheet.
     font_bold = Font(bold= True)        
@@ -133,7 +146,8 @@ def final_ws_formatting():  # Applies bold and borders to sections of excel to k
     for cell in fourth_row:
         final_ws[cell.coordinate].border = border_bottom
 
-final_ws_editing(steel_sku, "steel")
-final_ws_editing(alum_sku, "aluminum")
+range_declaration(steel_sku, "steel")
+range_declaration(alum_sku, "aluminum")
+final_ws_editing(range_sort(declared_ranges))
 
 final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test.xlsx")
