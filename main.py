@@ -1,5 +1,6 @@
 import os
 import glob
+from datetime import date
 
 import openpyxl
 from openpyxl import Workbook
@@ -150,4 +151,6 @@ range_declaration(steel_sku, "steel")
 range_declaration(alum_sku, "aluminum")
 final_ws_editing(range_sort(declared_ranges))
 
-final_wb.save("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test.xlsx")
+today = date.today().isoformat().replace("-","")
+
+final_wb.save(f"/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test_{today}.xlsx")
