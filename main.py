@@ -7,6 +7,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.styles import Border, Side
 
+today = date.today().isoformat().replace("-","")
+
 list_of_files = glob.glob("/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/INVND*")
 latest_file = max(list_of_files, key=os.path.getctime)
 
@@ -93,6 +95,8 @@ def range_declaration(skus, metal):  # finds the cell ranges in metal_master_ws 
                     
         if needs_declaration == True:
             print(f"Sku {sku.value} needs {metal} to be declared.")
+            with open(f"/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/reports/metal_declaration_report{today}", "a") as f:
+                f.write(f"Sku {sku.value} needs {metal} to be declared.\n")
 
 def range_sort(ranges):
     ranges_sorted = sorted(ranges, key=lambda pairing: pairing[1].row)
@@ -154,7 +158,7 @@ range_declaration(alum_sku, "aluminum")
 range_declaration(copper_sku, "copper")
 final_ws_editing(range_sort(declared_ranges))
 
-today = date.today().isoformat().replace("-","")
-
 final_wb.save(f"/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test_{today}.xlsx")
+
+print("",f"\nSkus to be delcared saved in reports folder as metal_declaration_report{today} inside ronelle_close_files on the desktop.")
 input("Press Enter to exit...")
