@@ -113,7 +113,7 @@ def final_ws_editing(sorted_ranges):  # Adds shipment info to the final sheet fo
         for i in range(len(final_cells)):
             final_ws[final_cells[i].coordinate] = metal_master_ws[metal_master_cells[i].coordinate].value
         final_ws[f"A{2 + final_ws_tracker}"] = inv_ws[f"A{sku.row}"].value  # Adds in the shipment ID.
-        final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"B{sku.row}"].value  # Adds in the Invoice Number.
+        final_ws[f"B{2 + final_ws_tracker}"] = inv_ws[f"C{sku.row}"].value  # Adds in the Invoice Number.
         final_ws[f"D{2 + final_ws_tracker}"] = inv_ws[f"H{sku.row}"].value  # Changes the quanity of items sent.
         final_ws[f"F{2 + final_ws_tracker}"] = round(float(inv_ws[f"J{sku.row}"].value) # float() used to work around ' infront of numbers
                                                     * float(final_ws[f"F{2 + final_ws_tracker}"].value), 2)
@@ -157,3 +157,4 @@ final_ws_editing(range_sort(declared_ranges))
 today = date.today().isoformat().replace("-","")
 
 final_wb.save(f"/mnt/c/Users/Bart/Desktop/Harmonized Chapters/work_files/final_test_{today}.xlsx")
+input("Press Enter to exit...")
