@@ -92,7 +92,7 @@ def range_declaration(skus, metal):  # finds the cell ranges in metal_master_ws 
                     declared_ranges.append(declared_range_and_sku)
                     
         if needs_declaration == True:
-            print(f"Sku {sku.value} needs {metal} to be declared.")
+            print(f"Sku {sku.value} on line {sku.row} needs {metal} to be declared.")
             with open(f"{report}/metal_declaration_report{today}", "a") as f:
                 f.write(f"Sku {sku.value} needs {metal} to be declared.\n")
 
