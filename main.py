@@ -158,5 +158,8 @@ final_ws_editing(range_sort(declared_ranges))
 
 final_wb.save(f"{save}/final_test_{today}.xlsx")
 
-print("",f"\nSkus to be delcared saved in reports folder as metal_declaration_report{today} inside ronelle_close_files on the desktop.")
+if os.path.isfile(f"{report}/metal_declaration_report{today}"):
+    print("",f"\nSkus to be delcared saved in reports folder as metal_declaration_report{today} inside ronelle_close_files on the desktop.")
+else:
+    print("\nNo additional skus to be declared.\n")
 input("Press Enter to exit...")
